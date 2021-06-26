@@ -4,26 +4,23 @@ const hostname = 'localhost';
 
 // Load Dependencies
 var express = require('express');
-// Load configuration from .env file
-require('dotenv').config();
 
 // Load and initialize MesageBird SDK
-var messagebird = require('messagebird')('TQWMwfiH3bHO1wRhDCrarjF8d');
+var messagebird = require('messagebird')('NGmsyJo6a1shkTrlfSp9AjCFw');
 
 // Set up and configure the Express framework
 const app = express();
-app.use(bodyParser.urlencoded({ extended : true }));
-
+app.use(express.json());
+app.use(express.urlencoded({extended : true}));
 
 // Handle phone number submission
-app.post('/api/phone/msgGen', function(req, res) {
-    var number = req.body.number;
-    
+app.post("/api/phone/msgGen", function(req, res) {
+    var number = req.body.phone;
+    console.log(number);
+    console.log(req.body);
     // Make request to Verify API
-    messagebird.verify.create(number, {
-        // originator : 'Code',
-        // template : 'Your verification code is %token.'
-    }, function (err, response) {
+    messagebird.verify.create(number,{originator : 'Code',template : 'Your verification code is %token.'}, function (err, response)
+     {
         if (err) {
             // Request has failed
             console.log(err);
@@ -31,7 +28,7 @@ app.post('/api/phone/msgGen', function(req, res) {
         } else {
             // Request was successful
             console.log(response);
-            res.render({status:200, error: false, msgSent: true});
+            res.json({status:200, error: false, msgSent: true});
         }
     })    
 });
@@ -46,11 +43,11 @@ app.post('/api/phone/verifyCode', function(req, res) {
         if (err) {
             // Verification has failed
             console.log(err);
-            res.render({status:400, error:true, msg: err.errors[0].description,});
+            res.json({status:400, error:true, msg: err.errors[0].description,});
         } else {
             // Verification was successful
             console.log(response);
-            res.render({status:200, error: false, codeVerified: true});
+            res.json({status:200, error: false, codeVerified: true});
         }
     })    
 });
@@ -59,3 +56,4 @@ app.post('/api/phone/verifyCode', function(req, res) {
 app.listen(port, hostname, ()=> {
     console.log(`Listneing to port at http://${hostname}:${port}/api/phone`);
 });
+
